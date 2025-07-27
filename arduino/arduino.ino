@@ -12,7 +12,7 @@
 const float MV_PER_AMP   = 39.8; // 100mV/A for STK-600/M 50A model
 const float VCC          = 5.0;  // VCC
 const int ADC_RESOLUTION = 1024; // 10-bit ADC
-constexpr double VOLT_PER_TICK = 0.04904248046875;
+constexpr double VOLT_PER_TICK = 0.04881;
 int N_BLADE = 2;
 
 template <unsigned N, typename T = float >

@@ -174,11 +174,12 @@ class CompactSerialMonitor(QMainWindow):
         
         # Gauge configuration
         self.gauge_config = [
-            {"title": "Thrust", "min": 0, "max": 5000, "units": "g", "key": "weight"},
+            {"title": "Thrust", "min": 0, "max": 5000, "units": "g", "key": "thrust"},
             {"title": "Current", "min": 0, "max": 30, "units": "A", "key": "current"},
             {"title": "Voltage", "min": 0, "max": 30, "units": "V", "key": "voltage"},
             {"title": "RPM", "min": 0, "max": 15000, "units": "rpm", "key": "rpm"},
-            {"title": "Power", "min": 0, "max": 1000, "units": "W", "key": "power"}
+            {"title": "Power", "min": 0, "max": 1000, "units": "W", "key": "power"},
+            {"title": "Eff", "min": 0, "max": 30, "units": "g/W", "key": "eff"},
         ]
         
         # Create main widgets
@@ -439,11 +440,12 @@ class CompactSerialMonitor(QMainWindow):
         
         # Initialize variables
         self.last_update_time = time.time()
-        self.weight_value = 0
+        self.thrust_value = 0
         self.current_value = 0
         self.voltage_value = 0
         self.rpm_value = 0
         self.power_value = 0
+        self.eff_value = 0
         self.log_entries = []
         self.is_logging = False
         
@@ -645,31 +647,36 @@ class CompactSerialMonitor(QMainWindow):
             if len(parts) >= 5:
                 # Parse all values
                 time_ms = int(parts[0].strip())
-                weight = float(parts[1].strip())
+                thrust = float(parts[1].strip())
                 current = float(parts[2].split()[0].strip())
                 voltage = float(parts[3].split()[0].strip())
                 rpm = float(parts[4].split()[0].strip())
                 
                 # Calculate power
                 power = voltage * current
+
+                # Calculate eff
+                eff = thrust/power;
                 
                 # Update values
-                self.weight_value = weight
+                self.thrust_value = thrust
                 self.current_value = current
                 self.voltage_value = voltage
                 self.rpm_value = rpm
                 self.power_value = power
+                self.eff_value = eff
                 self.last_update_time = time.time()
                 
                 # Update gauges from configuration
-                self.gauges["weight"].set_value(weight)
+                self.gauges["thrust"].set_value(thrust)
                 self.gauges["current"].set_value(current)
                 self.gauges["voltage"].set_value(voltage)
                 self.gauges["rpm"].set_value(rpm)
                 self.gauges["power"].set_value(power)
+                self.gauges["eff"].set_value(eff)
                 
                 # Update time display
-                self.time_label.setText(f"{time_ms} ms")
+                self.time_label.setText(f"{time_ms/1000.0} s")
         except ValueError as e:
             # Don't log non-CSV errors since we're already ignoring them
             pass
