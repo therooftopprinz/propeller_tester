@@ -341,7 +341,7 @@ class CompactSerialMonitor(QMainWindow):
                 border-radius: 3px;
             }
         """)
-        self.power_slider.sliderReleased.connect(self.send_power_value)
+        self.power_slider.valueChanged.connect(self.send_power_value)
         power_layout.addWidget(self.power_slider, 0, 1, 1, 3)
         
         # Delta control
@@ -653,10 +653,14 @@ class CompactSerialMonitor(QMainWindow):
                 rpm = float(parts[4].split()[0].strip())
                 
                 # Calculate power
-                power = voltage * current
+                power = 0
+                if (current >= 0.001):
+                    power = voltage * current
 
                 # Calculate eff
-                eff = thrust/power;
+                eff = 0
+                if (power >= 0.001):
+                    eff = thrust/power;
                 
                 # Update values
                 self.thrust_value = thrust
